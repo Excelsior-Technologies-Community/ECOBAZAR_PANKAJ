@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import {
   MapPin,
   ChevronDown,
@@ -10,21 +11,35 @@ import {
   PhoneCall,
 } from "lucide-react";
 import logo from "../assets/logo.png";
+import { useCart } from "../Context/CartContext.jsx";
 
 const navLinks = [
-  { label: "Home", hasDropdown: true },
-  { label: "Shop", hasDropdown: true },
-  { label: "Pages", hasDropdown: true },
-  { label: "Blog", hasDropdown: true },
-  { label: "About Us", hasDropdown: false },
-  { label: "Contact Us", hasDropdown: false },
+  { label: "Home", path: "/" },
+  { label: "Shop", path: "/shop" },
+  {
+    label: "Pages",
+    children: [
+      { label: "FAQ", path: "/faq" },
+      { label: "Settings", path: "/settings" },
+    ],
+  },
+  { label: "Blog", path: "/blog" },
+  { label: "About Us", path: "/about" },
+  { label: "Contact Us", path: "/contact" },
 ];
+
+const navLinkClass = ({ isActive }) =>
+  `text-sm font-medium transition ${
+    isActive ? "text-[#00B207]" : "text-gray-200 hover:text-green-400"
+  }`;
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const [mobilePagesOpen, setMobilePagesOpen] = useState(false);
+  const { cartCount, cartSubtotal } = useCart();
   return (
-    <header className="w-full top-0 sticky z-50">
+    <header className="sticky top-0 z-50 w-full">
+      {/* ================= TOP BAR ================= */}
       <div className="border-b border-gray-200 bg-white text-sm text-gray-500">
         <div className="mx-auto flex max-w-[1320px] items-center justify-between px-4 py-2">
           {/* Left */}
@@ -47,7 +62,6 @@ const Navbar = () => {
 
             <div className="hidden h-4 w-px bg-gray-300 sm:block"></div>
 
-            {/* hide sign in from mobile top bar */}
             <button className="hidden text-gray-500 transition hover:text-green-600 sm:block">
               Sign In / Sign Up
             </button>
@@ -61,9 +75,9 @@ const Navbar = () => {
           {/* ---------- Desktop / Laptop ---------- */}
           <div className="hidden lg:flex lg:items-center lg:justify-between lg:gap-4">
             {/* Logo */}
-            <div className="flex items-center shrink-0">
+            <Link to="/" className="flex shrink-0 items-center">
               <img src={logo} alt="EcoBazar Logo" className="h-10 w-auto" />
-            </div>
+            </Link>
 
             {/* Search */}
             <div className="flex w-full max-w-[600px] overflow-hidden rounded-md border border-gray-300">
@@ -81,43 +95,45 @@ const Navbar = () => {
             </div>
 
             {/* Wishlist + Cart */}
-            <div className="flex items-center justify-end gap-4 shrink-0">
+            <div className="flex shrink-0 items-center justify-end gap-4">
               <button className="relative text-gray-700 transition hover:text-green-600">
                 <Heart size={28} strokeWidth={1.8} />
               </button>
 
               <div className="h-7 w-px bg-gray-300"></div>
-
-              <button className="relative flex items-center gap-3 text-left">
+              <Link
+                to="/cart"
+                className="relative flex items-center gap-3 text-left"
+              >
                 <div className="relative text-gray-700">
                   <ShoppingBag size={28} strokeWidth={1.8} />
-                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-[11px] font-medium text-white">
-                    2
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-green-600 px-1 text-[11px] font-medium text-white">
+                    {cartCount}
                   </span>
                 </div>
 
                 <div>
                   <p className="text-xs text-gray-500">Shopping cart:</p>
                   <p className="text-base font-semibold text-gray-900">
-                    $57.00
+                    ${cartSubtotal.toFixed(2)}
                   </p>
                 </div>
-              </button>
+              </Link>
             </div>
           </div>
 
           {/* ---------- Mobile / Tablet ---------- */}
           <div className="flex flex-col gap-4 lg:hidden">
-            {/* Row 1: logo + sign in + heart + cart */}
+            {/* Row 1 */}
             <div className="flex items-center justify-between gap-3">
-              {/* Logo */}
-              <img
-                src={logo}
-                alt="EcoBazar Logo"
-                className="h-8 w-auto sm:h-9"
-              />
+              <Link to="/">
+                <img
+                  src={logo}
+                  alt="EcoBazar Logo"
+                  className="h-8 w-auto sm:h-9"
+                />
+              </Link>
 
-              {/* Right actions */}
               <div className="flex items-center gap-3 sm:gap-4">
                 <button className="text-xs font-medium text-gray-600 transition hover:text-green-600 sm:text-sm">
                   Sign In / Sign Up
@@ -136,7 +152,7 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Row 2: Search */}
+            {/* Row 2 */}
             <div className="flex w-full overflow-hidden rounded-md border border-gray-300">
               <div className="flex flex-1 items-center px-3">
                 <Search size={18} className="text-gray-400" />
@@ -157,17 +173,49 @@ const Navbar = () => {
       {/* ================= BOTTOM NAVBAR ================= */}
       <div className="bg-[#333333] text-white">
         <div className="mx-auto flex max-w-[1320px] items-center justify-between px-4 py-4">
-          {/* Desktop Menu */}
+          {/* ===== Desktop Menu ===== */}
           <div className="hidden items-center gap-8 lg:flex">
-            {navLinks.map((link) => (
-              <button
-                key={link.label}
-                className="flex items-center gap-1 text-sm font-medium text-gray-200 transition hover:text-green-400"
-              >
-                {link.label}
-                {link.hasDropdown && <ChevronDown size={16} />}
-              </button>
-            ))}
+            {navLinks.map((link) => {
+              if (link.children) {
+                return (
+                  <div key={link.label} className="group relative">
+                    <button className="flex items-center gap-1 text-sm font-medium text-gray-200 transition hover:text-green-400">
+                      {link.label}
+                      <ChevronDown size={16} />
+                    </button>
+
+                    {/* Dropdown */}
+                    <div className="invisible absolute left-0 top-full z-30 mt-3 min-w-[200px] translate-y-2 rounded-[10px] border border-[#E6E6E6] bg-white p-2 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                      {link.children.map((child) => (
+                        <NavLink
+                          key={child.label}
+                          to={child.path}
+                          className={({ isActive }) =>
+                            `block rounded-md px-4 py-2.5 text-sm transition ${
+                              isActive
+                                ? "bg-[#F2FFF2] font-medium text-[#00B207]"
+                                : "text-[#1A1A1A] hover:bg-[#F7F7F7]"
+                            }`
+                          }
+                        >
+                          {child.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <NavLink
+                  key={link.label}
+                  to={link.path}
+                  className={navLinkClass}
+                >
+                  {link.label}
+                </NavLink>
+              );
+            })}
           </div>
 
           {/* Desktop Phone */}
@@ -176,7 +224,7 @@ const Navbar = () => {
             <span>(219) 555-0114</span>
           </div>
 
-          {/* Mobile Menu Row */}
+          {/* ===== Mobile Menu Row ===== */}
           <div className="flex w-full items-center justify-between lg:hidden">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -192,7 +240,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Drawer */}
+        {/* ================= MOBILE DRAWER ================= */}
         {mobileMenuOpen && (
           <div className="border-t border-white/10 bg-[#333333] px-4 py-4 lg:hidden">
             <div className="mb-4 flex items-center justify-between">
@@ -205,16 +253,68 @@ const Navbar = () => {
               </button>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <button
-                  key={link.label}
-                  className="flex items-center justify-between border-b border-white/10 pb-3 text-left text-sm font-medium text-gray-200"
-                >
-                  <span>{link.label}</span>
-                  {link.hasDropdown && <ChevronDown size={16} />}
-                </button>
-              ))}
+            <div className="flex flex-col gap-2">
+              {navLinks.map((link) => {
+                if (link.children) {
+                  return (
+                    <div
+                      key={link.label}
+                      className="border-b border-white/10 pb-3"
+                    >
+                      <button
+                        onClick={() => setMobilePagesOpen((prev) => !prev)}
+                        className="flex w-full items-center justify-between text-left text-sm font-medium text-gray-200"
+                      >
+                        <span>{link.label}</span>
+                        <ChevronDown
+                          size={16}
+                          className={`transition ${
+                            mobilePagesOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {mobilePagesOpen && (
+                        <div className="mt-3 flex flex-col gap-2 pl-3">
+                          {link.children.map((child) => (
+                            <NavLink
+                              key={child.label}
+                              to={child.path}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className={({ isActive }) =>
+                                `rounded-md px-3 py-2 text-sm transition ${
+                                  isActive
+                                    ? "bg-white/10 text-[#00B207]"
+                                    : "text-gray-300 hover:bg-white/10 hover:text-white"
+                                }`
+                              }
+                            >
+                              {child.label}
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                return (
+                  <NavLink
+                    key={link.label}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `border-b border-white/10 pb-3 text-sm font-medium transition ${
+                        isActive
+                          ? "text-[#00B207]"
+                          : "text-gray-200 hover:text-green-400"
+                      }`
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                );
+              })}
             </div>
           </div>
         )}
