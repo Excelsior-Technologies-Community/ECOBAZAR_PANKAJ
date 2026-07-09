@@ -11,7 +11,8 @@ import {
   PhoneCall,
 } from "lucide-react";
 import logo from "../assets/logo.png";
-import { useCart } from "../Context/CartContext.jsx";
+import { useCart } from "../Contexts/CartContext";
+import { useWishlist } from "../Contexts/WishListContext";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -36,7 +37,10 @@ const navLinkClass = ({ isActive }) =>
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobilePagesOpen, setMobilePagesOpen] = useState(false);
+
   const { cartCount, cartSubtotal } = useCart();
+  const { wishlistCount } = useWishlist();
+
   return (
     <header className="sticky top-0 z-50 w-full">
       {/* ================= TOP BAR ================= */}
@@ -61,10 +65,12 @@ const Navbar = () => {
             </div>
 
             <div className="hidden h-4 w-px bg-gray-300 sm:block"></div>
-
-            <button className="hidden text-gray-500 transition hover:text-green-600 sm:block">
+            <Link
+              to="/login"
+              className="hidden text-gray-500 transition hover:text-green-600 sm:block"
+            >
               Sign In / Sign Up
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -96,20 +102,33 @@ const Navbar = () => {
 
             {/* Wishlist + Cart */}
             <div className="flex shrink-0 items-center justify-end gap-4">
-              <button className="relative text-gray-700 transition hover:text-green-600">
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative text-gray-700 transition hover:text-green-600"
+              >
                 <Heart size={28} strokeWidth={1.8} />
-              </button>
+                {wishlistCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-green-600 px-1 text-[11px] font-medium text-white">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
 
               <div className="h-7 w-px bg-gray-300"></div>
+
+              {/* Cart */}
               <Link
                 to="/cart"
                 className="relative flex items-center gap-3 text-left"
               >
                 <div className="relative text-gray-700">
                   <ShoppingBag size={28} strokeWidth={1.8} />
-                  <span className="absolute -right-2 -top-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-green-600 px-1 text-[11px] font-medium text-white">
-                    {cartCount}
-                  </span>
+                  {cartCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-green-600 px-1 text-[11px] font-medium text-white">
+                      {cartCount}
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -135,20 +154,38 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center gap-3 sm:gap-4">
-                <button className="text-xs font-medium text-gray-600 transition hover:text-green-600 sm:text-sm">
+                <Link
+                  to="/login"
+                  className="text-xs font-medium text-gray-600 transition hover:text-green-600 sm:text-sm"
+                >
                   Sign In / Sign Up
-                </button>
+                </Link>
 
-                <button className="relative text-gray-700 transition hover:text-green-600">
+                {/* Wishlist */}
+                <Link
+                  to="/wishlist"
+                  className="relative text-gray-700 transition hover:text-green-600"
+                >
                   <Heart size={24} strokeWidth={1.8} />
-                </button>
+                  {wishlistCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-green-600 px-1 text-[10px] font-medium text-white">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
 
-                <button className="relative text-gray-700 transition hover:text-green-600">
+                {/* Cart */}
+                <Link
+                  to="/cart"
+                  className="relative text-gray-700 transition hover:text-green-600"
+                >
                   <ShoppingBag size={24} strokeWidth={1.8} />
-                  <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-green-600 text-[10px] font-medium text-white">
-                    2
-                  </span>
-                </button>
+                  {cartCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-green-600 px-1 text-[10px] font-medium text-white">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Eye, Heart, ShoppingBag, Star, ArrowRight } from "lucide-react";
 import { products } from "../../data/product";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../Contexts/CartContext";
 import saleImg from "../../assets/rightbanner1.jpg";
 
 const productColumns = [

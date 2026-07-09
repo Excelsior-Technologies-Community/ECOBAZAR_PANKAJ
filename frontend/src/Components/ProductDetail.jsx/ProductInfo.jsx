@@ -4,7 +4,7 @@ import { BsFacebook } from "react-icons/bs";
 import { useState } from "react";
 import { Star, Heart, ShoppingBag, Plus, Minus } from "lucide-react";
 import { FaPinterestP } from "react-icons/fa";
-import { useCart } from "../../Context/CartContext";
+import { useCart } from "../../Contexts/CartContext";
 
 const ProductInfoSection = ({ product }) => {
   const [quantity, setQuantity] = useState(1);

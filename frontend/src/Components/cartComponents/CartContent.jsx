@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { X, Minus, Plus } from "lucide-react";
-import { useCart } from "../../Context/CartContext.jsx";
+import { useCart } from "../../Contexts/CartContext.jsx";
 
 const CartContent = () => {
   const { cartItems, removeFromCart, increaseQty, decreaseQty, cartSubtotal } =
