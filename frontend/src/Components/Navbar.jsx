@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
 import {
   MapPin,
   ChevronDown,
@@ -13,6 +11,8 @@ import {
 import logo from "../assets/logo.png";
 import { useCart } from "../Contexts/CartContext";
 import { useWishlist } from "../Contexts/WishListContext";
+import { useEffect, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -37,7 +37,28 @@ const navLinkClass = ({ isActive }) =>
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobilePagesOpen, setMobilePagesOpen] = useState(false);
+  const navigate = useNavigate();
 
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      setLoggedInUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setLoggedInUser(null);
+    setMobileMenuOpen(false); // mobile drawer bhi close ho jaye
+
+    navigate("/");
+    window.location.reload();
+  };
   const { cartCount, cartSubtotal } = useCart();
   const { wishlistCount } = useWishlist();
 
@@ -65,12 +86,25 @@ const Navbar = () => {
             </div>
 
             <div className="hidden h-4 w-px bg-gray-300 sm:block"></div>
-            <Link
-              to="/login"
-              className="hidden text-gray-500 transition hover:text-green-600 sm:block"
-            >
-              Sign In / Sign Up
-            </Link>
+            {loggedInUser ? (
+              <div className="hidden items-center gap-3 sm:flex">
+                <span className="text-gray-600">Hi, {loggedInUser.name}</span>
+
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-500 transition hover:text-green-600"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden text-gray-500 transition hover:text-green-600 sm:block"
+              >
+                Sign In / Sign Up
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -154,12 +188,27 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center gap-3 sm:gap-4">
-                <Link
-                  to="/login"
-                  className="text-xs font-medium text-gray-600 transition hover:text-green-600 sm:text-sm"
-                >
-                  Sign In / Sign Up
-                </Link>
+                {loggedInUser ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-gray-600 sm:text-sm">
+                      Hi, {loggedInUser.name}
+                    </span>
+
+                    <button
+                      onClick={handleLogout}
+                      className="text-xs font-medium text-gray-600 transition hover:text-green-600 sm:text-sm"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="text-xs font-medium text-gray-600 transition hover:text-green-600 sm:text-sm"
+                  >
+                    Sign In / Sign Up
+                  </Link>
+                )}
 
                 {/* Wishlist */}
                 <Link

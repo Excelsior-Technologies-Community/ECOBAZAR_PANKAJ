@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import db from "./Config/db.js";
+import UserRouter from "./Routes/AuthRoute.js";
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,8 @@ app.get("/", (req, res) => {
         message: " EcoBazar backend is runnig"
     })
 })
+
+app.use("/api/user", UserRouter);
 const startServer = async () => {
     try {
         const [rows] = await db.query("SELECT 1");
