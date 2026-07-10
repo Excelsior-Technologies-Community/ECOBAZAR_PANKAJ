@@ -50,3 +50,58 @@ export const registerUser = async (req, res) => {
         });
     }
 }
+
+
+
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required"
+            })
+        }
+
+        const [[user]] = await db.query(`select * from users where email = ? `, [email]);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "user doest found"
+            })
+        }
+
+        const isPassMatch = await bcrypt.compare(password, user.password);
+
+        if (!isPassMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "invalid pass"
+            })
+        }
+
+        const token = generateToken(user.id);
+
+        return res.status(200).json({
+            success: true,
+            message: "loginn succesfully",
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            }
+        })
+    } catch (error) {
+        console.error("LOGIN ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Login failed",
+            error: error.message,
+        });
+    }
+}
