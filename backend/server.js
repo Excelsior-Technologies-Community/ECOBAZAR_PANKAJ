@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import db from "./Config/db.js";
 import UserRouter from "./Routes/AuthRoute.js";
+import ProductRouter from "./Routes/ProductRoute.js";
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/user", UserRouter);
+app.use("/api/products", ProductRouter);
 const startServer = async () => {
     try {
         const [rows] = await db.query("SELECT 1");
