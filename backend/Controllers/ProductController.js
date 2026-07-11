@@ -125,7 +125,7 @@ export const createProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
     try {
-        const [products] = db.query(`select * from products order by id desc `)
+        const [products] = await db.query(`select * from products order by id desc `)
 
         const formattedProducts = products.map((product) => ({
             id: product.id,
@@ -306,33 +306,33 @@ export const updateProduct = async (req, res) => {
 
         const updatedImage = req.file ? req.file.path : existingProduct.image;
 
-        await db.query(
+        const [result] = await db.query(
             `
-      UPDATE products
-      SET
-        name = ?,
-        price = ?,
-        old_price = ?,
-        rating = ?,
-        reviews_count = ?,
-        image = ?,
-        badge = ?,
-        badge_type = ?,
-        out_of_stock = ?,
-        category = ?,
-        sku = ?,
-        stock_status = ?,
-        brand = ?,
-        discount = ?,
-        short_description = ?,
-        description = ?,
-        features = ?,
-        weight = ?,
-        color = ?,
-        type = ?,
-        organic = ?
-      WHERE id = ?
-      `,
+  UPDATE products
+  SET
+    name = ?,
+    price = ?,
+    old_price = ?,
+    rating = ?,
+    reviews_count = ?,
+    image = ?,
+    badge = ?,
+    badge_type = ?,
+    out_of_stock = ?,
+    category = ?,
+    sku = ?,
+    stock_status = ?,
+    brand = ?,
+    discount = ?,
+    short_description = ?,
+    description = ?,
+    features = ?,
+    weight = ?,
+    color = ?,
+    type = ?,
+    organic = ?
+  WHERE id = ?
+  `,
             [
                 name ?? existingProduct.name,
                 price ?? existingProduct.price,
@@ -363,6 +363,7 @@ export const updateProduct = async (req, res) => {
             ]
         );
 
+        console.log(result);
         return res.status(200).json({
             success: true,
             message: "Product updated successfully",
