@@ -4,14 +4,14 @@ import { useWishlist } from "../../Contexts/WishListContext";
 import { useCart } from "../../Contexts/CartContext";
 
 const WishlistcontentSection = () => {
-  const { wishlistItems, removeFromWishlist } = useWishlist();
+  const { wishlistItems, removeWishlist } = useWishlist();
   const { addToCart } = useCart();
 
   const handleAddToCart = (product) => {
     if (product.outOfStock) return;
-    addToCart(product, 1);
-  };
 
+    addToCart(product.productId, 1);
+  };
   return (
     <section className="px-4 py-12 lg:py-16">
       <div className="mx-auto max-w-[1320px]">
@@ -65,7 +65,7 @@ const WishlistcontentSection = () => {
                       {/* Product */}
                       <div className="flex items-center gap-4">
                         <Link
-                          to={`/product/${item.id}`}
+                          to={`/product/${item.productId}`}
                           className="flex h-[90px] w-[90px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-white"
                         >
                           <img
@@ -76,7 +76,7 @@ const WishlistcontentSection = () => {
                         </Link>
 
                         <div className="min-w-0">
-                          <Link to={`/product/${item.id}`}>
+                          <Link to={`/product/${item.productId}`}>
                             <h3 className="truncate text-base font-medium text-[#1A1A1A] transition hover:text-[#00B207]">
                               {item.name}
                             </h3>
@@ -121,7 +121,7 @@ const WishlistcontentSection = () => {
 
                       {/* Remove */}
                       <button
-                        onClick={() => removeFromWishlist(item.id)}
+                        onClick={() => removeWishlist(item.id)}
                         className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E6E6E6] text-[#666666] transition hover:border-[#EA4B48] hover:text-[#EA4B48]"
                       >
                         <X size={18} />
@@ -132,7 +132,7 @@ const WishlistcontentSection = () => {
                     <div className="flex flex-col gap-4 px-4 py-5 md:hidden">
                       <div className="flex gap-4">
                         <Link
-                          to={`/product/${item.id}`}
+                          to={`/product/${item.productId}`}
                           className="flex h-[90px] w-[90px] shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-white"
                         >
                           <img
@@ -145,7 +145,7 @@ const WishlistcontentSection = () => {
                         <div className="flex min-w-0 flex-1 flex-col">
                           <div className="flex items-start justify-between gap-3">
                             <Link
-                              to={`/product/${item.id}`}
+                              to={`/product/${item.productId}`}
                               className="min-w-0"
                             >
                               <h3 className="truncate text-base font-medium text-[#1A1A1A] transition hover:text-[#00B207]">
@@ -154,7 +154,7 @@ const WishlistcontentSection = () => {
                             </Link>
 
                             <button
-                              onClick={() => removeFromWishlist(item.id)}
+                              onClick={() => removeWishlist(item.id)}
                               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#E6E6E6] text-[#666666] transition hover:border-[#EA4B48] hover:text-[#EA4B48]"
                             >
                               <X size={16} />

@@ -1,61 +1,95 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import axios from "axios";
 
 const WishlistContext = createContext();
 
-const WISHLIST_STORAGE_KEY = "ecobazar_wishlist";
-
 export const WishlistProvider = ({ children }) => {
-  const [wishlistItems, setWishlistItems] = useState(() => {
-    const storedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
-    return storedWishlist ? JSON.parse(storedWishlist) : [];
-  });
+  const [wishlistItems, setWishlistItems] = useState([]);
 
-  // save to localStorage
   useEffect(() => {
-    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
+    fetchWishlist();
+  }, []);
+  const fetchWishlist = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
+      const { data } = await axios.get("http://localhost:5000/api/wishlist", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setWishlistItems(data.wishlist);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // add to wishlist
-  const addToWishlist = (product) => {
-    setWishlistItems((prev) => {
-      const alreadyExists = prev.some((item) => item.id === product.id);
-      if (alreadyExists) return prev;
-      return [...prev, product];
-    });
+  const addToWishlist = async (productId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.post(
+        "http://localhost:5000/api/wishlist",
+        {
+          productId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      fetchWishlist();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // remove from wishlist
-  const removeFromWishlist = (productId) => {
-    setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
+  const removeWishlist = async (wishlistId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.delete(`http://localhost:5000/api/wishlist/${wishlistId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      await fetchWishlist();
+    } catch (error) {
+      console.log(error);
+    }
   };
+  const toggleWishlist = async (product) => {
+    const exists = wishlistItems.some((item) => item.productId === product.id);
 
-  // toggle wishlist
-  const toggleWishlist = (product) => {
-    setWishlistItems((prev) => {
-      const exists = prev.some((item) => item.id === product.id);
+    if (exists) {
+      const wishlistItem = wishlistItems.find(
+        (item) => item.productId === product.id,
+      );
 
-      if (exists) {
-        return prev.filter((item) => item.id !== product.id);
-      }
-
-      return [...prev, product];
-    });
+      await removeWishlist(wishlistItem.id);
+    } else {
+      await addToWishlist(product.id);
+    }
   };
-
   // check if product exists
   const isInWishlist = (productId) => {
-    return wishlistItems.some((item) => item.id === productId);
+    return wishlistItems.some((item) => item.productId === productId);
   };
-
   const wishlistCount = useMemo(() => wishlistItems.length, [wishlistItems]);
 
   const value = {
     wishlistItems,
     addToWishlist,
-    removeFromWishlist,
+    removeWishlist,
     toggleWishlist,
     isInWishlist,
     wishlistCount,
+    fetchWishlist,
   };
 
   return (
