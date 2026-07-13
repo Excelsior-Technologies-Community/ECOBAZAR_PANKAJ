@@ -85,13 +85,15 @@ const CartContent = () => {
 
                           {/* Price */}
                           <p className="text-base font-medium text-[#1A1A1A]">
-                            ${item.price.toFixed(2)}
+                            ${item.price}
                           </p>
 
                           {/* Quantity */}
                           <div className="inline-flex h-[46px] w-fit items-center rounded-full border border-[#E6E6E6] px-2">
                             <button
-                              onClick={() => decreaseQty(item.id)}
+                              onClick={() =>
+                                decreaseQty(item.id, item.quantity)
+                              }
                               className="flex h-8 w-8 items-center justify-center rounded-full text-[#1A1A1A] transition hover:bg-[#F2F2F2]"
                             >
                               <Minus size={16} />
@@ -102,7 +104,9 @@ const CartContent = () => {
                             </span>
 
                             <button
-                              onClick={() => increaseQty(item.id)}
+                              onClick={() =>
+                                increaseQty(item.id, item.quantity)
+                              }
                               className="flex h-8 w-8 items-center justify-center rounded-full text-[#1A1A1A] transition hover:bg-[#F2F2F2]"
                             >
                               <Plus size={16} />
@@ -151,14 +155,14 @@ const CartContent = () => {
                               <p className="mt-2 text-sm text-[#808080]">
                                 Price:{" "}
                                 <span className="font-medium text-[#1A1A1A]">
-                                  ${item.price.toFixed(2)}
+                                  ${item.price}
                                 </span>
                               </p>
 
                               <p className="mt-1 text-sm text-[#808080]">
                                 Subtotal:{" "}
                                 <span className="font-semibold text-[#1A1A1A]">
-                                  ${itemSubtotal.toFixed(2)}
+                                  ${itemSubtotal}
                                 </span>
                               </p>
                             </div>
@@ -168,7 +172,9 @@ const CartContent = () => {
                           <div className="flex items-center justify-between gap-4">
                             <div className="inline-flex h-[46px] w-fit items-center rounded-full border border-[#E6E6E6] px-2">
                               <button
-                                onClick={() => decreaseQty(item.id)}
+                                onClick={() =>
+                                  decreaseQty(item.id, item.quantity)
+                                }
                                 className="flex h-8 w-8 items-center justify-center rounded-full text-[#1A1A1A] transition hover:bg-[#F2F2F2]"
                               >
                                 <Minus size={16} />
@@ -179,7 +185,9 @@ const CartContent = () => {
                               </span>
 
                               <button
-                                onClick={() => increaseQty(item.id)}
+                                onClick={() =>
+                                  increaseQty(item.id, item.quantity)
+                                }
                                 className="flex h-8 w-8 items-center justify-center rounded-full text-[#1A1A1A] transition hover:bg-[#F2F2F2]"
                               >
                                 <Plus size={16} />

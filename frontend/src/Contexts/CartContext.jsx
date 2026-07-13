@@ -1,72 +1,132 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-
+import axios from "axios";
 const CartContext = createContext();
 
-const CART_STORAGE_KEY = "ecobazar_cart";
-
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
-    const storedCart = localStorage.getItem(CART_STORAGE_KEY);
-    return storedCart ? JSON.parse(storedCart) : [];
-  });
-
-  // save cart to localStorage whenever cart changes
-  useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-  }, [cartItems]);
+  const [cartItems, setCartItems] = useState([]);
 
   // ===== Add to Cart =====
-  const addToCart = (product, quantity = 1) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
+  const addToCart = async (productId, quantity = 1) => {
+    try {
+      const token = localStorage.getItem("token");
 
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item,
-        );
-      }
+      const { data } = await axios.post(
+        "http://localhost:5000/api/cart",
+        {
+          productId,
+          quantity,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-      return [...prevItems, { ...product, quantity }];
-    });
+      await fetchCart();
+    } catch (error) {
+      console.log(error);
+    }
   };
+  const fetchCart = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
+      const { data } = await axios.get("http://localhost:5000/api/cart", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setCartItems(data.cart);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchCart();
+  }, []);
   // ===== Remove from Cart =====
-  const removeFromCart = (productId) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.id !== productId),
-    );
+  const removeFromCart = async (cartId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.delete(`http://localhost:5000/api/cart/${cartId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchCart();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // ===== Increase Quantity =====
-  const increaseQty = (productId) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === productId ? { ...item, quantity: item.quantity + 1 } : item,
-      ),
-    );
+  const increaseQty = async (cartId, currentQuantity) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:5000/api/cart/${cartId}`,
+        {
+          quantity: currentQuantity + 1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      fetchCart();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // ===== Decrease Quantity =====
-  const decreaseQty = (productId) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === productId
-          ? {
-              ...item,
-              quantity: item.quantity > 1 ? item.quantity - 1 : 1,
-            }
-          : item,
-      ),
-    );
+  const decreaseQty = async (cartId, currentQuantity) => {
+    try {
+      if (currentQuantity <= 1) return;
+
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:5000/api/cart/${cartId}`,
+        {
+          quantity: currentQuantity - 1,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      fetchCart();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // ===== Clear Cart =====
-  const clearCart = () => {
-    setCartItems([]);
-  };
+  const clearCart = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
+      await axios.delete("http://localhost:5000/api/cart/clear/all", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchCart();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // ===== Total item count =====
   const cartCount = useMemo(() => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
