@@ -11,7 +11,7 @@ const ProductInfoSection = ({ product }) => {
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    addToCart(product.id, 1);
   };
   const increaseQty = () => setQuantity((prev) => prev + 1);
   const decreaseQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
@@ -96,7 +96,7 @@ const ProductInfoSection = ({ product }) => {
               )}
 
               <span className="text-[28px] font-semibold text-[#2C742F] sm:text-[32px]">
-                ${product.price.toFixed(2)}
+                ${product.price}
               </span>
 
               {product.discount && (

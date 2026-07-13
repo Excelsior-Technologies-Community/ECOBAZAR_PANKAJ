@@ -6,6 +6,8 @@ import UserRouter from "./Routes/AuthRoute.js";
 import ProductRouter from "./Routes/ProductRoute.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./Config/Swagger.js";
+import CartRouter from "./Routes/CartRoute.js";
+import WishlistRouter from "./Routes/WishListRoute.js";
 
 dotenv.config();
 const app = express();
@@ -23,6 +25,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", UserRouter);
 app.use("/api/products", ProductRouter);
+app.use("/api/cart", CartRouter)
+app.use("/api/wishlist", WishlistRouter)
 app.use(
     "/api-docs",
     swaggerUi.serve,

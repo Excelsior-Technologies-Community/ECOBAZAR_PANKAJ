@@ -1,8 +1,23 @@
 import ShopProductCard from "../ShopComponents/ShopProductCard";
-import { products } from "../../data/product";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const FeaturedProducts = () => {
-  const featuredProducts = products.slice(9, 13);
+  const [products, setproducts] = useState([]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  const fetchProduct = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:5000/api/products");
+      setproducts(data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const featuredProducts = products.slice(4, 8);
 
   return (
     <section className="px-4 pb-14 lg:pb-20">

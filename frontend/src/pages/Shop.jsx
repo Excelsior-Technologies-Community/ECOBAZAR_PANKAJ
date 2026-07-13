@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 
 import ShopHeroSection from "../Components/ShopComponents/ShopHeroSection";
 import ShopProductCard from "../Components/ShopComponents/ShopProductCard";
-
-import { products } from "../data/product.js";
+import axios from "axios";
 
 const categoryOptions = [
   "All",
@@ -50,14 +49,33 @@ const Shop = () => {
   const [showCount, setShowCount] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+
+      const { data } = await axios.get("http://localhost:5000/api/products");
+      setProducts(data.products);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to load products");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
     // category filter
     if (selectedCategory !== "All") {
-      filtered = filtered.filter(
-        (product) => product.category === selectedCategory,
-      );
+      filtered = filtered.filter((p) => p.category === selectedCategory);
     }
 
     // price filter
@@ -98,19 +116,30 @@ const Shop = () => {
     }
 
     return filtered;
-  }, [selectedCategory, selectedPrice, selectedRating, sortBy]);
+  }, [products, selectedCategory, selectedPrice, selectedRating, sortBy]);
 
   const totalPages = Math.ceil(filteredProducts.length / showCount) || 1;
 
   const paginatedProducts = useMemo(() => {
     const startIndex = (currentPage - 1) * showCount;
     return filteredProducts.slice(startIndex, startIndex + showCount);
-  }, [filteredProducts, currentPage, showCount]);
+  }, [, filteredProducts, currentPage, showCount]);
 
   const clearCategory = () => setSelectedCategory("All");
   const clearPrice = () => setSelectedPrice("All Prices");
   const clearRating = () => setSelectedRating("All Ratings");
-
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        Loading Products...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">{error}</div>
+    );
+  }
   return (
     <>
       <ShopHeroSection />

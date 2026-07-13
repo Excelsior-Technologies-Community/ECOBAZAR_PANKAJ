@@ -1,25 +1,39 @@
 import { Link } from "react-router-dom";
 import { Eye, Heart, ShoppingBag, Star, ArrowRight } from "lucide-react";
-import { products } from "../../data/product";
+
 import { useCart } from "../../Contexts/CartContext";
 import saleImg from "../../assets/rightbanner1.jpg";
-
-const productColumns = [
-  {
-    title: "Hot Deals",
-    products: products.slice(0, 3),
-  },
-  {
-    title: "Best Seller",
-    products: products.slice(3, 6),
-  },
-  {
-    title: "Top Rated",
-    products: products.slice(6, 9),
-  },
-];
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const ProductShowcase = () => {
+  const [products, setproducts] = useState([]);
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  const fetchProduct = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:5000/api/products");
+      setproducts(data.products);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const productColumns = [
+    {
+      title: "Hot Deals",
+      products: products.slice(0, 3),
+    },
+    {
+      title: "Best Seller",
+      products: products.slice(3, 6),
+    },
+    {
+      title: "Top Rated",
+      products: products.slice(6, 9),
+    },
+  ];
   return (
     <section className="px-4 py-12 lg:py-16">
       <div className="mx-auto max-w-[1320px]">

@@ -4,12 +4,49 @@ import ProductDetailsHero from "../Components/ProductDetail.jsx/ProductDetailHer
 import ProductInfoSection from "../Components/ProductDetail.jsx/ProductInfo";
 import ProductTabsSection from "../Components/ProductDetail.jsx/ProductTabSection";
 import RelatedProduct from "../Components/ProductDetail.jsx/RelatedProduct";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [product, setProducts] = useState(null);
+  const [error, setError] = useState("");
 
-  const product = products.find((item) => item.id === Number(id));
+  useEffect(() => {
+    getProduct();
+    console.log(product);
+    console.log(product?.reviews);
+  }, [id]);
 
+  const getProduct = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `http://localhost:5000/api/products/${id}`,
+      );
+      setProducts(data.product);
+      console.log(data.product);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to load product.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">{error}</div>
+    );
+  }
   if (!product) {
     return (
       <section className="px-4 py-16">

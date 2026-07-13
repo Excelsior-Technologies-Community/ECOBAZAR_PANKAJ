@@ -10,13 +10,11 @@ const ShopProductCard = ({ product }) => {
   const isWishlisted = isInWishlist(product.id);
 
   const handleAddToCart = () => {
-    addToCart(product, 1);
+    addToCart(product.id, 1);
   };
-
-  const handleToggleWishlist = () => {
-    toggleWishlist(product);
+  const handleToggleWishlist = async () => {
+    await toggleWishlist(product);
   };
-
   return (
     <div className="group relative overflow-hidden rounded-[10px] border border-[#E6E6E6] bg-white transition-all duration-300 hover:border-[#2C742F] hover:shadow-[0_12px_32px_rgba(32,181,38,0.12)]">
       {/* Product Image + badges */}
