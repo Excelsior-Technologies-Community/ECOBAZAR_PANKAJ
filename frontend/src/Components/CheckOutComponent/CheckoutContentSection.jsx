@@ -1,10 +1,97 @@
 import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../../Contexts/CartContext";
-
 const CheckoutContentSection = () => {
-  const { cartItems, cartSubtotal } = useCart();
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const navigate = useNavigate();
 
+  const { cartItems, cartSubtotal, clearCart, fetchCart } = useCart();
+
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    company: "",
+    address: "",
+    country: "",
+    state: "",
+    city: "",
+    zipCode: "",
+    email: "",
+    phone: "",
+    orderNote: "",
+    paymentMethod: "COD",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const payload = {
+        fullName: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+        country: formData.country,
+        state: formData.state,
+        city: formData.city,
+        address: formData.address,
+        zipCode: formData.zipCode,
+        orderNote: formData.orderNote,
+        paymentMethod: formData.paymentMethod,
+      };
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.address ||
+        !formData.country ||
+        !formData.state ||
+        !formData.city ||
+        !formData.zipCode ||
+        !formData.email ||
+        !formData.phone
+      ) {
+        alert("Please fill all required fields");
+
+        return;
+      }
+      if (cartItems.length === 0) {
+        alert("Your cart is empty");
+
+        return;
+      }
+      const { data } = await axios.post(
+        "http://localhost:5000/api/order",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      alert(data.message);
+
+      await fetchCart();
+
+      navigate("/my-orders");
+    } catch (error) {
+      console.log(error);
+
+      alert(error.response?.data?.message || "Failed to place order");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <section className="px-4 py-12 lg:py-16">
       <div className="mx-auto max-w-[1320px]">
@@ -26,6 +113,9 @@ const CheckoutContentSection = () => {
                     </label>
                     <input
                       type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
                       placeholder="Your first name"
                       className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                     />
@@ -37,6 +127,9 @@ const CheckoutContentSection = () => {
                     </label>
                     <input
                       type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
                       placeholder="Your last name"
                       className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                     />
@@ -49,6 +142,9 @@ const CheckoutContentSection = () => {
                     </label>
                     <input
                       type="text"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleChange}
                       placeholder="Company name"
                       className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                     />
@@ -62,7 +158,10 @@ const CheckoutContentSection = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Email"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Street Address"
                     className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                   />
                 </div>
@@ -73,11 +172,16 @@ const CheckoutContentSection = () => {
                     <label className="mb-2 block text-sm font-medium text-[#1A1A1A]">
                       Country / Region
                     </label>
-                    <select className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm text-[#808080] outline-none transition focus:border-[#00B207]">
+                    <select
+                      name="country"
+                      value={formData.country}
+                      onChange={handleChange}
+                      className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm text-[#808080] outline-none transition focus:border-[#00B207]"
+                    >
                       <option value="">Select</option>
-                      <option value="india">India</option>
-                      <option value="usa">USA</option>
-                      <option value="uk">United Kingdom</option>
+                      <option value="India">India</option>
+                      <option value="USA">USA</option>
+                      <option value="UK">United Kingdom</option>
                     </select>
                   </div>
 
@@ -85,11 +189,16 @@ const CheckoutContentSection = () => {
                     <label className="mb-2 block text-sm font-medium text-[#1A1A1A]">
                       States
                     </label>
-                    <select className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm text-[#808080] outline-none transition focus:border-[#00B207]">
-                      <option value="">Selects</option>
-                      <option value="gujarat">Gujarat</option>
-                      <option value="maharashtra">Maharashtra</option>
-                      <option value="delhi">Delhi</option>
+                    <select
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm text-[#808080] outline-none transition focus:border-[#00B207]"
+                    >
+                      <option value="">Select</option>
+                      <option value="Gujarat">Gujarat</option>
+                      <option value="Maharashtra">Maharashtra</option>
+                      <option value="Delhi">Delhi</option>
                     </select>
                   </div>
 
@@ -99,7 +208,24 @@ const CheckoutContentSection = () => {
                     </label>
                     <input
                       type="text"
+                      name="zipCode"
+                      value={formData.zipCode}
+                      onChange={handleChange}
                       placeholder="Zip Code"
+                      className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-[#1A1A1A]">
+                      City
+                    </label>
+
+                    <input
+                      type="text"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      placeholder="City"
                       className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                     />
                   </div>
@@ -113,6 +239,9 @@ const CheckoutContentSection = () => {
                     </label>
                     <input
                       type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
                       placeholder="Email Address"
                       className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                     />
@@ -124,6 +253,9 @@ const CheckoutContentSection = () => {
                     </label>
                     <input
                       type="text"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
                       placeholder="Phone number"
                       className="h-[52px] w-full rounded-[8px] border border-[#E6E6E6] px-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                     />
@@ -153,6 +285,9 @@ const CheckoutContentSection = () => {
                 </label>
                 <textarea
                   rows={6}
+                  name="orderNote"
+                  value={formData.orderNote}
+                  onChange={handleChange}
                   placeholder="Notes about your order, e.g. special notes for delivery"
                   className="w-full rounded-[8px] border border-[#E6E6E6] px-4 py-4 text-sm outline-none transition placeholder:text-[#999999] focus:border-[#00B207]"
                 ></textarea>
@@ -235,10 +370,10 @@ const CheckoutContentSection = () => {
                 <label className="flex cursor-pointer items-center gap-3 text-sm text-[#4D4D4D]">
                   <input
                     type="radio"
-                    name="payment"
-                    value="cod"
-                    checked={paymentMethod === "cod"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    name="paymentMethod"
+                    value="COD"
+                    checked={formData.paymentMethod === "COD"}
+                    onChange={handleChange}
                     className="h-4 w-4 accent-[#00B207]"
                   />
                   Cash on Delivery
@@ -247,39 +382,28 @@ const CheckoutContentSection = () => {
                 <label className="flex cursor-pointer items-center gap-3 text-sm text-[#4D4D4D]">
                   <input
                     type="radio"
-                    name="payment"
-                    value="paypal"
-                    checked={paymentMethod === "paypal"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    name="paymentMethod"
+                    value="Razorpay"
+                    checked={formData.paymentMethod === "Razorpay"}
+                    onChange={handleChange}
                     className="h-4 w-4 accent-[#00B207]"
                   />
-                  Paypal
-                </label>
-
-                <label className="flex cursor-pointer items-center gap-3 text-sm text-[#4D4D4D]">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="amazon"
-                    checked={paymentMethod === "amazon"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="h-4 w-4 accent-[#00B207]"
-                  />
-                  Amazon Pay
+                  RazorPay
                 </label>
               </div>
             </div>
 
             {/* Button */}
             <button
+              onClick={handlePlaceOrder}
+              disabled={loading || cartItems.length === 0}
               className={`mt-8 flex h-[52px] w-full items-center justify-center rounded-full px-6 text-sm font-semibold text-white transition ${
-                cartItems.length === 0
+                loading || cartItems.length === 0
                   ? "cursor-not-allowed bg-[#BDBDBD]"
                   : "bg-[#00B207] hover:bg-green-700"
               }`}
-              disabled={cartItems.length === 0}
             >
-              Place Order
+              {loading ? "Placing Order..." : "Place Order"}
             </button>
           </div>
         </div>
