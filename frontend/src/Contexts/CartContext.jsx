@@ -149,6 +149,7 @@ export const CartProvider = ({ children }) => {
     clearCart,
     cartCount,
     cartSubtotal,
+    fetchCart,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
