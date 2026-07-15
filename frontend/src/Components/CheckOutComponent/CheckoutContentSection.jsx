@@ -30,8 +30,11 @@ const CheckoutContentSection = () => {
       [e.target.name]: e.target.value,
     }));
   };
-
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (
+    paymentStatus,
+    razorpayPaymentId = null,
+    razorpayOrderId = null,
+  ) => {
     try {
       setLoading(true);
 
@@ -47,7 +50,12 @@ const CheckoutContentSection = () => {
         address: formData.address,
         zipCode: formData.zipCode,
         orderNote: formData.orderNote,
+
         paymentMethod: formData.paymentMethod,
+        paymentStatus,
+
+        razorpayPaymentId,
+        razorpayOrderId,
       };
       if (
         !formData.firstName ||
@@ -90,6 +98,81 @@ const CheckoutContentSection = () => {
       alert(error.response?.data?.message || "Failed to place order");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRazorpayPayment = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Create Razorpay Order
+      const { data } = await axios.post(
+        "http://localhost:5000/api/payment/create-order",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const options = {
+        key: data.key,
+
+        amount: data.order.amount,
+
+        currency: data.order.currency,
+
+        name: "EcoBazar",
+
+        description: "Order Payment",
+
+        order_id: data.order.id,
+
+        handler: async function (response) {
+          try {
+            const token = localStorage.getItem("token");
+
+            const { data } = await axios.post(
+              "http://localhost:5000/api/payment/verify",
+              response,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
+
+            if (data.success) {
+              await handlePlaceOrder(
+                "Paid",
+                response.razorpay_payment_id,
+                response.razorpay_order_id,
+              );
+            }
+          } catch (error) {
+            console.error(error);
+            alert("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: formData.full_name,
+          email: formData.email,
+          contact: formData.phone,
+        },
+
+        theme: {
+          color: "#00B207",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.open();
+    } catch (error) {
+      console.error(error);
+
+      alert("Unable to start payment");
     }
   };
   return (
@@ -395,7 +478,13 @@ const CheckoutContentSection = () => {
 
             {/* Button */}
             <button
-              onClick={handlePlaceOrder}
+              onClick={async () => {
+                if (formData.paymentMethod === "COD") {
+                  await handlePlaceOrder("Pending", null, null);
+                } else {
+                  await handleRazorpayPayment();
+                }
+              }}
               disabled={loading || cartItems.length === 0}
               className={`mt-8 flex h-[52px] w-full items-center justify-center rounded-full px-6 text-sm font-semibold text-white transition ${
                 loading || cartItems.length === 0

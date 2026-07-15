@@ -1,8 +1,10 @@
 import db from "../Config/db.js";
 
+
 export const createOrder = async (req, res) => {
     try {
         const userId = req.user.id;
+
         const {
             fullName,
             email,
@@ -14,43 +16,51 @@ export const createOrder = async (req, res) => {
             zipCode,
             orderNote,
             paymentMethod,
+            paymentStatus,
+            razorpayOrderId,
+            razorpayPaymentId,
         } = req.body;
 
-        if (!fullName || !email || !phone || !country || !city || !state || !address || !zipCode || !orderNote || !paymentMethod) {
+        // ============================
+        // Get Cart Items
+        // ============================
 
-            return res.status(400).json({
-                success: false,
-                message: "please fill all required fields"
-            })
-        }
-
-        //get cart items
-        const [cartItems] = await db.query(`select 
-            cart_items.product_id ,
-            cart_items.quantity ,
-            products.price
-
-            from cart_items
-
-            inner join products
-            on cart_items.product_id = products.id 
-            where cart_items.user_id = ?` , [userId])
+        const [cartItems] = await db.query(
+            `
+      SELECT
+        cart_items.product_id,
+        cart_items.quantity,
+        products.price
+      FROM cart_items
+      JOIN products
+      ON cart_items.product_id = products.id
+      WHERE cart_items.user_id = ?
+      `,
+            [userId]
+        );
 
         if (cartItems.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: "cart is empty"
-            })
+                message: "Cart is empty",
+            });
         }
 
-        //calculate total amt
-        let totalAmount = 0;
-        cartItems.forEach((item) => {
-            totalAmount += Number(item.price) * item.quantity;
-        })
+        // ============================
+        // Calculate Total
+        // ============================
 
-        //create order
-        const [orderResult] = await db.query(`
+        const totalAmount = cartItems.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+        );
+
+        // ============================
+        // Create Order
+        // ============================
+
+        const [orderResult] = await db.query(
+            `
       INSERT INTO orders
       (
         user_id,
@@ -64,10 +74,13 @@ export const createOrder = async (req, res) => {
         zip_code,
         order_note,
         total_amount,
-        payment_method
+        payment_method,
+        payment_status,
+        razorpay_order_id,
+        razorpay_payment_id
       )
       VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
             [
                 userId,
@@ -82,28 +95,46 @@ export const createOrder = async (req, res) => {
                 orderNote,
                 totalAmount,
                 paymentMethod,
+                paymentStatus,
+                razorpayOrderId,
+                razorpayPaymentId,
             ]
         );
 
         const orderId = orderResult.insertId;
 
-        //insert order items 
+        // ============================
+        // Insert Order Items
+        // ============================
+
         for (const item of cartItems) {
-            const subtotal = Number(item.price) * item.quantity;
-
             await db.query(
-                `insert into order_items (order_id , product_id ,quantity ,price ,subtotal) values (?,?,?,?,?)`, [
-                orderId,
-                item.product_id,
-                item.quantity,
-                item.price,
-                subtotal,
-            ]
-            )
+                `
+        INSERT INTO order_items
+        (
+          order_id,
+          product_id,
+          quantity,
+          price,subtotal
+        )
+        VALUES
+        (?, ?, ?, ?,?)
+        `,
+                [
+                    orderId,
+                    item.product_id,
+                    item.quantity,
+                    item.price,
+                    item.price * item.quantity,
 
-
+                ]
+            );
         }
+
+        // ============================
         // Clear Cart
+        // ============================
+
         await db.query(
             `
       DELETE FROM cart_items
@@ -117,13 +148,13 @@ export const createOrder = async (req, res) => {
             message: "Order placed successfully",
             orderId,
         });
+
     } catch (error) {
-        console.error("CREATE ORDER ERROR:", error);
+        console.log("CREATE ORDER ERROR:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Failed to place order",
-            error: error.message,
+            message: "Internal Server Error",
         });
     }
 };
