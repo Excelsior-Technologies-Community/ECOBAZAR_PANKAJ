@@ -9,6 +9,7 @@ import swaggerSpec from "./Config/Swagger.js";
 import CartRouter from "./Routes/CartRoute.js";
 import WishlistRouter from "./Routes/WishListRoute.js";
 import OrderRouter from "./Routes/OrderRoute.js";
+import RazorRouter from "./Routes/RazorpayRoute.js";
 
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/products", ProductRouter);
 app.use("/api/cart", CartRouter)
 app.use("/api/wishlist", WishlistRouter)
 app.use("/api/order", OrderRouter);
+app.use("/api/payment", RazorRouter)
 app.use(
     "/api-docs",
     swaggerUi.serve,

@@ -248,7 +248,7 @@ export const getSingleProduct = async (req, res) => {
     }
 }
 
-// ================= UPDATE PRODUCT =================
+
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
