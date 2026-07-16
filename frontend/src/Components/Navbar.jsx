@@ -40,7 +40,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [loggedInUser, setLoggedInUser] = useState(null);
-
+  const isAdmin = loggedInUser?.role === "admin";
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
 
@@ -86,8 +86,22 @@ const Navbar = () => {
             </div>
 
             <div className="hidden h-4 w-px bg-gray-300 sm:block"></div>
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `hidden lg:block  text-sm font-medium transition ${
+                    isActive
+                      ? "text-[#00B207]"
+                      : "text-gray-600 hover:text-green-400"
+                  }`
+                }
+              >
+                Admin Panel
+              </NavLink>
+            )}
             {loggedInUser ? (
-              <div className="hidden items-center gap-3 sm:flex">
+              <div className=" items-center gap-3 sm:flex">
                 <span className="text-gray-600">Hi, {loggedInUser.name}</span>
 
                 <button
@@ -188,6 +202,21 @@ const Navbar = () => {
               </Link>
 
               <div className="flex items-center gap-3 sm:gap-4">
+                {isAdmin && (
+                  <NavLink
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `border-b border-white/10  text-sm font-medium transition ${
+                        isActive
+                          ? "text-[#00B207]"
+                          : "text-gray-600 hover:text-green-400"
+                      }`
+                    }
+                  >
+                    Admin
+                  </NavLink>
+                )}
                 {loggedInUser ? (
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-gray-600 sm:text-sm">
