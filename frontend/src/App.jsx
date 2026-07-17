@@ -20,6 +20,7 @@ import Dashboard from "./Admin/Pages/Dashboard.jsx";
 import Products from "./Admin/Pages/Products.jsx";
 import AddProduct from "./Admin/Pages/AddProduct.jsx";
 import EditProject from "./Admin/Pages/EditProject.jsx";
+import Orders from "./Admin/Pages/Orders.jsx";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <Route path="products" element={<Products />} />
             <Route path="products/add" element={<AddProduct />} />
             <Route path="products/edit/:id" element={<EditProject />} />
+            <Route path="orders" element={<Orders />} />
           </Route>
         </Route>
       </Routes>
