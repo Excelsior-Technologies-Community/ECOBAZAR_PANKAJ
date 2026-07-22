@@ -21,6 +21,12 @@ import Products from "./Admin/Pages/Products.jsx";
 import AddProduct from "./Admin/Pages/AddProduct.jsx";
 import EditProject from "./Admin/Pages/EditProject.jsx";
 import Orders from "./Admin/Pages/Orders.jsx";
+import User from "./Admin/Pages/User.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import Faq from "./pages/Faq.jsx";
+import Blog from "./pages/Blog.jsx";
+import BlogDetail from "./pages/BlogDetail.jsx";
 
 function App() {
   return (
@@ -31,12 +37,17 @@ function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/about" element={<About />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/checkout" element={<CheckOut />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/my-orders/:id" element={<OrderDetail />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
         </Route>
 
         <Route element={<AdminRoute />}>
@@ -46,6 +57,7 @@ function App() {
             <Route path="products/add" element={<AddProduct />} />
             <Route path="products/edit/:id" element={<EditProject />} />
             <Route path="orders" element={<Orders />} />
+            <Route path="users" element={<User />} />
           </Route>
         </Route>
       </Routes>
