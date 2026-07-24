@@ -5,6 +5,7 @@ import {
   Users,
   LogOut,
   X,
+  Store,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -28,6 +29,11 @@ const menuItems = [
     title: "Users",
     path: "/admin/users",
     icon: Users,
+  },
+  {
+    title: "Store",
+    path: "/",
+    icon: Store,
   },
 ];
 

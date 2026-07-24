@@ -14,6 +14,8 @@ import AdminOrderRouter from "./Routes/AdminOrderRoute.js";
 import AdminUserRouter from "./Routes/AdminUserRoute.js";
 import AdminDashboardRouter from "./Routes/AdminDashboardRoute.js";
 import ContactRouter from "./Routes/ContactRoute.js";
+import BlogRouter from "./Routes/BlogRoute.js";
+import AdminRouter from "./Routes/AdminBlogRoute.js";
 
 dotenv.config();
 const app = express();
@@ -39,6 +41,8 @@ app.use("/api/admin/orders", AdminOrderRouter)
 app.use("/api/admin/users", AdminUserRouter);
 app.use("/api/admin/dashboard", AdminDashboardRouter)
 app.use("/api/contact", ContactRouter)
+app.use("/api/blog", BlogRouter)
+app.use("/api/admin/blog", AdminRouter)
 app.use(
     "/api-docs",
     swaggerUi.serve,

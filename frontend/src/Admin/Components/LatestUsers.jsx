@@ -1,27 +1,28 @@
-const users = [
-  {
-    name: "Pankaj",
-    email: "pankaj@gmail.com",
-    joined: "Today",
-  },
-  {
-    name: "Rahul",
-    email: "rahul@gmail.com",
-    joined: "Yesterday",
-  },
-  {
-    name: "Amit",
-    email: "amit@gmail.com",
-    joined: "2 Days Ago",
-  },
-  {
-    name: "Neha",
-    email: "neha@gmail.com",
-    joined: "4 Days Ago",
-  },
-];
+// const users = [
+//   {
+//     name: "Pankaj",
+//     email: "pankaj@gmail.com",
+//     joined: "Today",
+//   },
+//   {
+//     name: "Rahul",
+//     email: "rahul@gmail.com",
+//     joined: "Yesterday",
+//   },
+//   {
+//     name: "Amit",
+//     email: "amit@gmail.com",
+//     joined: "2 Days Ago",
+//   },
+//   {
+//     name: "Neha",
+//     email: "neha@gmail.com",
+//     joined: "4 Days Ago",
+//   },
+// ];
 
-const LatestUsers = () => {
+const LatestUsers = ({ latestUsers }) => {
+  const users = latestUsers;
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
@@ -45,7 +46,9 @@ const LatestUsers = () => {
               <p className="text-sm text-gray-500">{user.email}</p>
             </div>
 
-            <span className="text-xs text-gray-400">{user.joined}</span>
+            <span className="text-xs text-gray-400">
+              {new Date(user.created_at).toLocaleDateString()}
+            </span>
           </div>
         ))}
       </div>

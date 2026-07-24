@@ -1,35 +1,35 @@
 import { Eye } from "lucide-react";
 
-const orders = [
-  {
-    id: "#1001",
-    customer: "Pankaj",
-    amount: "₹1,250",
-    payment: "Paid",
-    status: "Delivered",
-  },
-  {
-    id: "#1002",
-    customer: "Rahul",
-    amount: "₹899",
-    payment: "COD",
-    status: "Pending",
-  },
-  {
-    id: "#1003",
-    customer: "Amit",
-    amount: "₹2,340",
-    payment: "Paid",
-    status: "Processing",
-  },
-  {
-    id: "#1004",
-    customer: "Neha",
-    amount: "₹560",
-    payment: "Paid",
-    status: "Delivered",
-  },
-];
+// const orders = [
+//   {
+//     id: "#1001",
+//     customer: "Pankaj",
+//     amount: "₹1,250",
+//     payment: "Paid",
+//     status: "Delivered",
+//   },
+//   {
+//     id: "#1002",
+//     customer: "Rahul",
+//     amount: "₹899",
+//     payment: "COD",
+//     status: "Pending",
+//   },
+//   {
+//     id: "#1003",
+//     customer: "Amit",
+//     amount: "₹2,340",
+//     payment: "Paid",
+//     status: "Processing",
+//   },
+//   {
+//     id: "#1004",
+//     customer: "Neha",
+//     amount: "₹560",
+//     payment: "Paid",
+//     status: "Delivered",
+//   },
+// ];
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -47,7 +47,8 @@ const getStatusColor = (status) => {
   }
 };
 
-const RecentOrders = () => {
+const RecentOrders = ({ recentOrders }) => {
+  const orders = recentOrders;
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
@@ -84,19 +85,17 @@ const RecentOrders = () => {
               >
                 <td className="py-4 font-medium">{order.id}</td>
 
-                <td>{order.customer}</td>
+                <td>{order.full_name}</td>
 
-                <td>{order.amount}</td>
-
-                <td>{order.payment}</td>
+                <td>{order.total_amount}</td>
 
                 <td>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(
-                      order.status,
+                      order.order_status,
                     )}`}
                   >
-                    {order.status}
+                    {order.order_status}
                   </span>
                 </td>
 
