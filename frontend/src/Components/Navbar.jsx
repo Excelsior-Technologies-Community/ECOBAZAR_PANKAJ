@@ -21,7 +21,7 @@ const navLinks = [
     label: "Pages",
     children: [
       { label: "FAQ", path: "/faq" },
-      { label: "Settings", path: "/settings" },
+      { label: "MyOrders", path: "/my-orders" },
     ],
   },
   { label: "Blog", path: "/blog" },
